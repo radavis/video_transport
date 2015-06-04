@@ -6,4 +6,4 @@ try() { "$@" || die "cannot $*"; }
 
 yell "I am Yelling"
 
-try "ffmpeg"
+try ffmpeg -version

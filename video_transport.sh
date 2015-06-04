@@ -21,15 +21,21 @@ upload_to_file_server() {
 }
 
 convert() {
-  try ffmpeg -i $@ \
+  try ffmpeg --version
+  video_file=$1
+  output_file="${video_file%.*}.mp4"
+  growl "Starting conversion of $1"
+  try ffmpeg -i "$1" \
+    -vf "scale=iw*sar*min($WIDTH/(iw*sar)\,$HEIGHT/ih):ih*min($WIDTH/(iw*sar)\,$HEIGHT/ih),pad=$WIDTH:$HEIGHT:(ow-iw)/2:(oh-ih)/2" \
     -c:v libx264 \
     -preset ultrafast \
     -crf 20 \
-    -c:a libfdk_aac -vbr 4 -ac 2 \
-    -af highpass=f=20,lowpass=f=3000
+    -c:a aac -strict experimental \
+    -af highpass=f=20,lowpass=f=5000 \
     -movflags \
     +faststart \
-    $@.mp4
+    $output_file
+  growl "Finished conversion \noutput: $output_file"
 }
 
 video_file=$1
@@ -39,5 +45,5 @@ if [ ! -f "$video_file" ]; then
 fi
 
 try source .env
-# upload_to_file_server $video_file
+upload_to_file_server $video_file
 convert $video_file
