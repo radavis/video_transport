@@ -7,3 +7,6 @@ try() { "$@" || die "cannot $*"; }
 yell "I am Yelling"
 
 try ffmpeg -version
+
+base=$(basename $1 .mov)
+echo $base

@@ -36,6 +36,7 @@ convert() {
     +faststart \
     $output_file
   growl "Finished conversion \noutput: $output_file"
+  echo "$output_file"
 }
 
 video_file=$1
@@ -46,4 +47,6 @@ fi
 
 try source .env
 upload_to_file_server $video_file
-convert $video_file
+converted_file=$(convert $video_file)
+title=$(basename $1 .mov)
+try python ../py_video_sync/vimeo_uploader.py $video_file $title
