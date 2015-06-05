@@ -10,13 +10,11 @@ die() { yell "$*"; growl "$*"; exit 111; }
 try() { "$@" || die "cannot $*"; }
 
 upload_to_file_server() {
-  growl "Connecting to $FILE_SERVER_HOSTNAME"
   mkdir $MOUNT_POINT
   try mount_afp $FILE_SERVER $MOUNT_POINT
   growl "Uploading $@ to $FILE_SERVER_HOSTNAME"
   try cp -r $1 $MOUNT_POINT
   growl "Upload complete!"
-  growl "Disconnecting from $FILE_SERVER_HOSTNAME"
   umount $MOUNT_POINT
 }
 
