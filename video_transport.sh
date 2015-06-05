@@ -22,8 +22,8 @@ convert() {
   try ffmpeg --version
   video_file=$1
   output_file="${video_file%.*}.mp4"
-  growl "Starting conversion of $1"
-  try ffmpeg -i "$1" \
+  growl "Starting conversion of $video_file"
+  try ffmpeg -i "$video_file" \
     -vf "scale=iw*sar*min($WIDTH/(iw*sar)\,$HEIGHT/ih):ih*min($WIDTH/(iw*sar)\,$HEIGHT/ih),pad=$WIDTH:$HEIGHT:(ow-iw)/2:(oh-ih)/2" \
     -c:v libx264 \
     -preset ultrafast \
