@@ -1,0 +1,70 @@
+#!/bin/zsh
+
+readonly script_name=$(basename $0)
+readonly dir_name=$(dirname $0)
+readonly video_file=$1
+
+growl() {
+  message="display notification \"$*\" with title \"VideoTransport\""
+  osascript -e "$message"
+}
+
+log() {
+  echo "$@"
+  logger -p user.notice -t $script_name "$@"
+}
+
+err() {
+  echo "$@"
+  logger -p user.error -t $script_name "$@"
+}
+
+die() {
+  err "$*"
+  exit 111
+}
+
+try() {
+  "$@" || die "cannot $*"
+}
+
+upload_to_file_server() {
+  mkdir $MOUNT_POINT
+  try mount_afp $FILE_SERVER $MOUNT_POINT
+  try cp -r $1 $MOUNT_POINT
+  umount $MOUNT_POINT
+  log "$1 uploaded to $FILE_SERVER_HOSTNAME"
+}
+
+convert() {
+  mkdir "$(pwd)/temp"
+  output_file="$(pwd)/temp/temp.mp4"
+  try ffmpeg -i "$1" \
+    -vf "scale=iw*sar*min($WIDTH/(iw*sar)\,$HEIGHT/ih):ih*min($WIDTH/(iw*sar)\,$HEIGHT/ih),pad=$WIDTH:$HEIGHT:(ow-iw)/2:(oh-ih)/2" \
+    -c:v libx264 \
+    -preset ultrafast \
+    -crf 20 \
+    -c:a aac -strict experimental \
+    -af highpass=f=20,lowpass=f=5000 \
+    -movflags \
+    +faststart \
+    $output_file
+  echo "$output_file"
+}
+
+if [ ! -f "$video_file" ]; then
+  die "USAGE: $0 filename"
+fi
+
+mime_type=$(file --mime-type "$video_file")
+if ! grep -q "video/quicktime" <<< $mime_type; then
+  die "$1 is not a quicktime video."
+fi
+
+try source "$dir_name/.env"
+upload_to_file_server $video_file
+converted_file=$(convert $video_file)
+video_title=$(basename $video_file .mp4)
+
+# try python ../py_video_sync/vimeo_uploader.py $converted_file $video_title
+try rm $converted_file
