@@ -30,3 +30,9 @@ scale=iw*min($MAX_WIDTH/iw\,$MAX_HEIGHT/ih):ih*min($MAX_WIDTH/iw\,$MAX_HEIGHT/ih
 
 pad=$MAX_WIDTH:$MAX_HEIGHT:(ow-iw)/2:(oh-ih)/2
 ```
+
+
+## To Do
+
+* logging
+* include automator script
