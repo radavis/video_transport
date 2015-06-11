@@ -35,3 +35,4 @@ tail -f /var/log/system.log | grep "video_transport"
 * [ ] Post success/failure state to sinatra app
 * [x] Option to enable/disable local growl notifications
 * [ ] Check for successful upload (md5, filesize?)
+* [ ] Make it so that the order of arguments does not matter

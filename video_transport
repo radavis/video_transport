@@ -1,4 +1,4 @@
-#/bin/zsh
+#!/bin/zsh
 
 script_name=$(basename $0)
 
@@ -29,7 +29,7 @@ try() {
 }
 
 usage() {
-  echo "usage: video_transport [-g] -u username -h hostname -r remote_path -f local_file"
+  echo "\n$script_name\n  usage: video_transport -u username -h hostname -r remote_path -f local_file [-g]"
 }
 
 # Main
@@ -64,7 +64,12 @@ while [ "$1" != "" ]; do
 done
 
 if [ ! -f "$filename" ]; then
-  usage
+  die usage
+fi
+
+mime_type=$(file --mime-type "$filename")
+if ! grep -q "video/quicktime" <<< $mime_type; then
+  die "$filename is not a quicktime video."
 fi
 
 try scp $filename $username@$hostname:$remote_path
