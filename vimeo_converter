@@ -1,0 +1,21 @@
+#!/bin/zsh
+
+WIDTH=1280
+HEIGHT=720
+
+output_file="$(basename $1 .mov).mp4"
+
+ffmpeg -i "$1" \
+    -vf "scale=iw*sar*min($WIDTH/(iw*sar)\,$HEIGHT/ih):ih*min($WIDTH/(iw*sar)\,$HEIGHT/ih),pad=$WIDTH:$HEIGHT:(ow-iw)/2:(oh-ih)/2" \
+    -c:v libx264 \
+    -preset ultrafast \
+    -crf 20 \
+    -c:a aac -strict experimental \
+    -af highpass=f=20,lowpass=f=3000 \
+    -movflags \
+    +faststart \
+    "$output_file" >&2
+
+if [ -f "$output_file" ]; then
+  echo "$output_file"
+fi
